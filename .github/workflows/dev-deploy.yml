@@ -58,6 +58,6 @@ jobs:
               -e SPRING_PROFILES_ACTIVE=prod \
               -e DB_URL=${{ secrets.DB_URL }} \
               -e DB_USER=${{ secrets.DB_USER }} \
-              -e DB_PASSWORD=${{ secrets.DB_PW }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               -e EC2_HOST=${{ secrets.EC2_HOST }} \
               --name network-server -p 8080:8080 wendyjihyo77/sookbackend
