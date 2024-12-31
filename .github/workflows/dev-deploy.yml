@@ -53,9 +53,18 @@ jobs:
           port: 22
           script: |
             sudo usermod -aG docker $USER
+            
+            # 기존 컨테이너 강제 종료 및 삭제 (이미 존재할 경우 대비)
             sudo docker stop sookserver || true
             sudo docker rm sookserver || true
-            sudo docker image rm wendyjihyo77/sookbackend || true
+            
+            # 기존 이미지 삭제 (컨테이너가 사용 중이면 강제로 삭제)
+            sudo docker image rm -f wendyjihyo77/sookbackend || true
+            
+            # 같은 이름의 컨테이너가 이미 실행 중이라면 강제로 삭제
+            sudo docker rm -f network-server || true
+
+            # 새로운 이미지 풀 및 컨테이너 실행
             sudo docker pull wendyjihyo77/sookbackend
             sudo docker run -d \
               -e SPRING_PROFILES_ACTIVE=prod \
