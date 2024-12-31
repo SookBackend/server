@@ -53,19 +53,26 @@ jobs:
           port: 22
           script: |
             sudo usermod -aG docker $USER
-            
-            # 기존 컨테이너 강제 종료 및 삭제 (이미 존재할 경우 대비)
-            sudo docker stop sookserver || true
-            sudo docker rm sookserver || true
-            
-            # 기존 이미지 삭제 (컨테이너가 사용 중이면 강제로 삭제)
-            sudo docker image rm -f wendyjihyo77/sookbackend || true
-            
-            # 같은 이름의 컨테이너가 이미 실행 중이라면 강제로 삭제
-            sudo docker rm -f sookserver || true
 
-            # 새로운 이미지 풀 및 컨테이너 실행
+            # 8080 포트 사용 중인 컨테이너 확인 및 중지
+            if sudo lsof -i :8080; then
+              echo "Port 8080 is in use. Stopping the process..."
+              sudo fuser -k 8080/tcp
+            fi
+
+            # 기존 컨테이너 중지 및 삭제
+            if [ "$(sudo docker ps -q -f name=sookserver)" ]; then
+              sudo docker stop sookserver
+              sudo docker rm sookserver
+            fi
+
+            # 기존 이미지 삭제 (강제 옵션)
+            sudo docker image rm -f wendyjihyo77/sookbackend || true
+
+            # 새로운 이미지 풀링
             sudo docker pull wendyjihyo77/sookbackend
+
+            # 새로운 컨테이너 실행 (네트워크 포트 문제 방지)
             sudo docker run -d \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e DB_URL=${{ secrets.DB_URL }} \
@@ -73,3 +80,4 @@ jobs:
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               -e EC2_HOST=${{ secrets.EC2_HOST }} \
               --name sookserver -p 8080:8080 wendyjihyo77/sookbackend
+  
