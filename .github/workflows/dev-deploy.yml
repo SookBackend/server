@@ -62,7 +62,7 @@ jobs:
             sudo docker image rm -f wendyjihyo77/sookbackend || true
             
             # 같은 이름의 컨테이너가 이미 실행 중이라면 강제로 삭제
-            sudo docker rm -f network-server || true
+            sudo docker rm -f sookserver || true
 
             # 새로운 이미지 풀 및 컨테이너 실행
             sudo docker pull wendyjihyo77/sookbackend
@@ -72,4 +72,4 @@ jobs:
               -e DB_USER=${{ secrets.DB_USER }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               -e EC2_HOST=${{ secrets.EC2_HOST }} \
-              --name network-server -p 8080:8080 wendyjihyo77/sookbackend
+              --name sookserver -p 8080:8080 wendyjihyo77/sookbackend
